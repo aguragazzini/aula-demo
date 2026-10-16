@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Domus — Prototipo (borrador)</title>
+<meta name="description" content="Recursos para educar en casa: ciencias, historia y lógica. Prototipo de validación.">
+<style>
+:root{
+ --paper:#f6f3ea;--paper2:#fbf9f3;--ink:#1b1a17;--mute:#6d675c;--rule:#cfc8b8;--line-strong:#8a8372;--acc:#6e1e1e;
+ --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+ --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+ --hit:48px;--measure:62ch;
+ --t-sm:14px;--t-md:17px;--t-lg:20px;--t-xl:28px;--t-2xl:36px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:12px;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 var(--t-md)/1.55 var(--sans);padding-bottom:72px}
+h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.15;margin:0 0 .5em}
+h1{font-size:34px}h2{font-size:var(--t-xl)}h3{font-size:22px}
+p{margin:0 0 1em;max-width:var(--measure)}
+a{color:var(--acc)}
+.wrap{max-width:860px;margin:0 auto;padding:0 18px}
+section{padding:36px 0;border-top:1px solid var(--ink)}
+.sc{font-size:var(--t-sm);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
+.lede{font-family:var(--serif);font-size:21px;line-height:1.4;color:var(--ink)}
+.small{font-size:var(--t-sm);color:var(--mute)}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* header & nav */
+header.top{border-bottom:1px solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:20}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;min-height:56px}
+.brand{font-family:var(--serif);font-size:26px;text-decoration:none;color:var(--ink)}
+nav.main{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);border-top:1px solid var(--ink);display:flex}
+nav.main a{flex:1;min-height:56px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;text-decoration:none;color:var(--ink);padding:4px 2px}
+nav.main a:active{background:var(--rule)}
+@media(min-width:820px){
+ body{padding-bottom:0}h1{font-size:50px}
+ nav.main{position:static;border:0;background:none;width:auto}
+ header.top .wrap{gap:24px}nav.main a{flex:none;padding:0 14px;font-size:15px}
+}
+/* buttons / inputs */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:var(--hit);padding:10px 20px;font:500 16px var(--sans);background:var(--ink);color:var(--paper);border:1px solid var(--ink);cursor:pointer;text-decoration:none;border-radius:0}
+.btn:active{background:var(--acc);border-color:var(--acc)}
+.btn.sec{background:transparent;color:var(--ink)}
+.btn.sec:active{background:var(--rule)}
+.btn[disabled]{opacity:.5}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+input[type=email],select,textarea{width:100%;min-height:var(--hit);font:inherit;padding:10px 12px;background:var(--paper2);border:2px solid var(--line-strong);color:var(--ink);border-radius:0}
+label{display:block;font-weight:500;margin:0 0 6px}
+.chip{display:inline-flex;align-items:center;min-height:var(--hit);padding:8px 14px;border:2px solid var(--line-strong);background:var(--paper2);font:inherit;color:var(--ink);cursor:pointer;border-radius:0;text-align:left}
+.chip[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+/* tags */
+.tag{display:inline-block;font-size:13px;padding:2px 8px;border:1px solid var(--line-strong);margin-right:6px;color:var(--ink)}
+.tag.scr{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ej{display:inline-block;font-size:13px;font-weight:600;color:var(--acc);border:1px solid var(--acc);padding:1px 6px;margin-left:4px;vertical-align:middle}
+.notice{border:1px solid var(--ink);background:var(--paper2);padding:12px 14px;margin:16px 0;font-size:16px}
+/* lesson blocks */
+.block{border:1px solid var(--ink);background:var(--paper2);margin:18px 0}
+.block>h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--ink);display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.block>h3 .n{font-size:16px;color:var(--acc);font-family:var(--sans)}
+.block .in{padding:14px}
+ol.steps,ul.plain{padding-left:22px;margin:0 0 1em}
+ol.steps li,ul.plain li{margin-bottom:.4em}
+.tbl{width:100%;border-collapse:collapse;font-size:16px}
+.tbl th,.tbl td{text-align:left;border-bottom:1px solid var(--line-strong);padding:8px 6px;vertical-align:top}
+.tbl th{font-size:14px;color:var(--mute);font-weight:500}
+.scroll{overflow-x:auto}
+/* sim */
+.sim{border:1px solid var(--ink);background:var(--paper)}
+.sim canvas{display:block;width:100%;height:360px;touch-action:none;background:var(--paper2)}
+.ctrl{padding:12px 14px}
+.ctrl .line{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ctrl .line span.lab{min-width:96px;font-size:16px}
+.ctrl input[type=range]{flex:1;height:44px;margin:0;accent-color:var(--acc);touch-action:pan-y}
+.step{min-width:44px;min-height:44px;padding:0;font-size:22px}
+.readout{font-variant-numeric:tabular-nums;border-top:1px solid var(--ink);padding:10px 14px;font-size:16px;background:var(--paper2)}
+details{border-bottom:1px solid var(--line-strong)}
+summary{min-height:var(--hit);display:flex;align-items:center;cursor:pointer;font-weight:500;padding:6px 0}
+.q{border-top:1px solid var(--line-strong);padding:12px 0}
+.mark{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.opt{display:block;width:100%;text-align:left;margin:6px 0}
+.fb{margin-top:8px;padding:10px 12px;border-left:4px solid var(--ink);background:var(--paper)}
+.fb.bad{border-left-color:var(--acc)}
+.sr{position:absolute;left:-9999px}
+/* panel */
+.panel{border:2px solid var(--ink);background:var(--paper2);padding:14px}
+.grid{display:grid;gap:14px}
+@media(min-width:700px){.grid.c2{grid-template-columns:1fr 1fr}.grid.c3{grid-template-columns:1fr 1fr 1fr}}
+.card{border:1px solid var(--ink);padding:12px 14px;background:var(--paper2)}
+.card h3{font-size:21px}
+.bar{height:14px;border:1px solid var(--ink);background:var(--paper);position:relative;margin:4px 0 8px}
+.bar>i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
+.bar>b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--acc)}
+.sema{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.sema .d{width:22px;height:22px;border:2px solid var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1}
+.sema.g .d{background:var(--ink);color:var(--paper)}
+.sema.y .d{background:linear-gradient(90deg,var(--ink) 50%,var(--paper) 50%)}
+.sema.r .d{border-color:var(--acc);color:var(--acc);background:var(--paper)}
+.alert{border-left:4px solid var(--acc);padding:8px 12px;margin:8px 0;background:var(--paper)}
+.check{display:flex;align-items:center;gap:10px;min-height:var(--hit);border-bottom:1px solid var(--rule)}
+.check input{width:26px;height:26px;accent-color:var(--acc);flex:none}
+.check label{margin:0;font-weight:400;flex:1}
+footer{border-top:1px solid var(--ink);padding:28px 0 40px;font-size:15px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+ <a class="brand" href="#inicio">Domus</a>
+ <nav class="main" aria-label="Principal">
+  <a href="#inicio">Inicio</a><a href="#leccion">Lección</a><a href="#panel">Panel</a><a href="#edades">Edades</a><a href="#planes">Planes</a>
+ </nav>
+ <a class="btn sec" href="#espera" style="min-height:44px;padding:6px 14px">Lista de espera</a>
+</div></header>
+
+<main>
+<!-- PORTADA -->
+<section id="inicio" style="border-top:0"><div class="wrap">
+ <p class="sc">Prototipo · borrador para validar</p>
+ <h1>Aprender ciencias en casa, con una guía clara para el adulto.</h1>
+ <p class="lede">Lecciones cortas de ciencias duras, historia y lógica: una historia, una simulación, un experimento con materiales de casa y preguntas para conversar. El adulto no necesita saber la respuesta de memoria.</p>
+ <div class="row" style="margin:18px 0">
+  <a class="btn" href="#leccion">Probar una lección</a>
+  <a class="btn sec" href="#espera">Anotarme en la lista de espera</a>
+ </div>
+ <div class="grid c3" style="margin-top:22px">
+  <div class="card"><h3>Poca pantalla</h3><p class="small" style="font-size:16px;color:var(--ink)">Hasta 25 minutos frente a la pantalla por lección. El resto es mesa, manos y conversación.</p></div>
+  <div class="card"><h3>Dominio, no apuro</h3><p style="font-size:16px">Se avanza cuando se entendió, nunca por tiempo. Sin puntos, rachas ni medallas.</p></div>
+  <div class="card"><h3>Guía para el adulto</h3><p style="font-size:16px">5 preguntas por lección con respuesta modelo, y una pantalla “Si se traba”.</p></div>
+ </div>
+ <div class="notice"><b>Importante:</b> Domus es un complemento de estudio en casa. <b>No otorga título ni tiene validez oficial.</b> Este prototipo es una maqueta: los datos que ves en el panel son de <span class="ej">ejemplo</span>.</div>
+</div></section>
+
+<!-- LECCIÓN -->
+<section id="leccion"><div class="wrap">
+ <p class="sc">Lección de muestra · Ciencias · Unidad 3 (Energía)</p>
+ <h2>El péndulo: ¿de qué depende el vaivén?</h2>
+ <p><span class="tag">10–13 años</span><span class="tag">45–60 min</span><span class="tag scr">≈ 25 min con pantalla</span> <span class="tag">Borrador v0.1</span></p>
+ <p>La idea de la lección: <b>el tiempo de un vaivén depende del largo del hilo, no de la masa.</b></p>
+
+ <div class="scroll"><table class="tbl" aria-label="Bloques de la lección">
+  <tr><th>#</th><th>Bloque</th><th>Min</th><th>Pantalla</th></tr>
+  <tr><td>1</td><td>Historia y pregunta</td><td>3–5</td><td>Sí</td></tr>
+  <tr><td>2</td><td>Texto corto</td><td>7</td><td>Sí</td></tr>
+  <tr><td>3</td><td>Simulación guiada</td><td>10</td><td>Sí</td></tr>
+  <tr><td>4</td><td>Experimento casero</td><td>15–20</td><td>No</td></tr>
+  <tr><td>5</td><td>Preguntas para conversar</td><td>10</td><td>No</td></tr>
+  <tr><td>6</td><td>Chequeo de dominio</td><td>5</td><td>Sí</td></tr>
+ </table></div>
+ <p class="small" style="margin-top:8px">Pantalla: bloques 1, 2, 3 y 6 ≈ 25 min. Los minutos son valores de arranque que el piloto va a ajustar. Sin fuego ni electricidad de red.</p>
+
+ <!-- B1 -->
+ <div class="block" id="b1"><h3><span class="n">Bloque 1</span> Historia y pregunta <span class="tag scr">pantalla · 3–5 min</span></h3><div class="in">
+  <p>En una plaza hay una hamaca. Tu hermano chico pesa mucho menos que vos. Si los dos se hamacan con las mismas cadenas, <b>¿quién tarda más en ir y volver: él, vos, o tardan igual?</b></p>
+  <p class="small">Se dice que Galileo se puso a pensar en esto mirando una lámpara que oscilaba (es una anécdota tradicional que no verificamos).</p>
+  <p><b>Antes de seguir, anotá tu predicción.</b> Elegí una opción en cada pregunta (y si querés, escribí por qué en tu cuaderno).</p>
+  <p style="margin-bottom:6px"><b>A.</b> Si el más liviano y el más pesado se hamacan igual…</p>
+  <div class="chips" role="group" aria-label="Predicción A">
+   <button class="chip" data-pa="Tarda más el más pesado">Tarda más el más pesado</button>
+   <button class="chip" data-pa="Tarda más el más liviano">Tarda más el más liviano</button>
+   <button class="chip" data-pa="Tardan igual">Tardan igual</button>
+  </div>
+  <p style="margin:14px 0 6px"><b>B.</b> Si la cadena es más larga…</p>
+  <div class="chips" role="group" aria-label="Predicción B">
+   <button class="chip" data-pb="el vaivén es más lento">el vaivén es más lento</button>
+   <button class="chip" data-pb="el vaivén es más rápido">el vaivén es más rápido</button>
+   <button class="chip" data-pb="el vaivén tarda igual">el vaivén tarda igual</button>
+  </div>
+  <p class="small" id="predmsg" aria-live="polite" style="margin-top:8px">Todavía no elegiste. Cualquier respuesta sirve: es para comparar después.</p>
+ </div></div>
+
+ <!-- B2 -->
+ <div class="block" id="b2"><h3><span class="n">Bloque 2</span> Texto corto <span class="tag scr">pantalla · 7 min</span></h3><div class="in">
+  <details><summary>Cómo trabajar este texto (4 tiempos)</summary>
+   <ol class="steps" style="padding-top:8px">
+    <li><b>Antes:</b> mirar el dibujo, adivinar de qué trata y pensar una pregunta propia.</li>
+    <li><b>Durante:</b> el adulto lee en voz alta; después relee el chico.</li>
+    <li><b>Después:</b> buscar algo parecido (una hamaca, un reloj de pared) y explicarlo con palabras propias.</li>
+    <li><b>Chequeo:</b> contar el texto en 3 oraciones.</li>
+   </ol></details>
+  <figure style="margin:14px 0">
+   <svg viewBox="0 0 320 190" role="img" aria-labelledby="figt" style="width:100%;max-width:380px;height:auto;display:block;background:var(--paper)">
+    <title id="figt">Dibujo de un péndulo: un hilo de largo L colgado de un punto, con una pesa abajo, desplazado un ángulo desde la vertical.</title>
+    <line x1="60" y1="14" x2="260" y2="14" stroke="#1b1a17" stroke-width="3"/>
+    <line x1="160" y1="14" x2="160" y2="176" stroke="#8a8372" stroke-dasharray="5 4"/>
+    <line x1="160" y1="14" x2="230" y2="160" stroke="#1b1a17" stroke-width="2"/>
+    <circle cx="230" cy="160" r="14" fill="#f6f3ea" stroke="#6e1e1e" stroke-width="2.5"/>
+    <path d="M160 58 A44 44 0 0 1 182 52" fill="none" stroke="#6e1e1e" stroke-width="2"/>
+    <text x="190" y="64" font-size="18" font-family="Georgia,serif" font-style="italic">ángulo</text>
+    <text x="178" y="104" font-size="18" font-family="Georgia,serif" font-style="italic">L (largo)</text>
+    <text x="40" y="180" font-size="16" font-family="Georgia,serif" font-style="italic">pesa</text>
+    <line x1="72" y1="176" x2="212" y2="164" stroke="#8a8372" stroke-width="1"/>
+   </svg>
+   <figcaption class="small">Un péndulo: un hilo de largo L, una pesa y un ángulo desde el que se suelta.</figcaption>
+  </figure>
+  <p>Un <b>péndulo</b> es algo que cuelga de un hilo y se mueve de un lado a otro. Llamamos <b>oscilación</b> a ir y volver hasta el punto de partida. El tiempo que tarda una oscilación completa es el <b>período</b> y se mide en segundos.</p>
+  <p>Medimos tres cosas: el <b>largo</b> del hilo (L, en metros), el período (T, en segundos) y el <b>ángulo</b> desde el que lo soltamos, también llamado amplitud.</p>
+  <p>Si el ángulo es chico (hasta unos 20°), el período sigue una regla: <b>T = 2π · √(L / g)</b>, donde <i>g</i> es la aceleración de la gravedad. En Buenos Aires vale unos <b>9,797 m/s²</b>.</p>
+  <p>Fijate que <b>la masa no aparece</b> en la regla. Y que el largo está dentro de una raíz: para duplicar el período hay que <b>cuadruplicar</b> el largo.</p>
+  <p class="small"><b>Palabras nuevas (5):</b> péndulo · oscilación · período · amplitud · gravedad. Texto de borrador de Ciencias, ~250 palabras. El valor de g de Buenos Aires viene de tablas de gravedad local y del IGN (fuentes en <code>contenido/ciencias-leccion-muestra.md</code>).</p>
+ </div></div>
+
+ <!-- B3 -->
+ <div class="block" id="b3"><h3><span class="n">Bloque 3</span> Simulación guiada <span class="tag scr">pantalla · 10 min</span></h3><div class="in">
+  <p>Simulación propia (sin recursos de terceros). <b>Arrastrá la pesa con el dedo</b> para elegir el ángulo y soltala, o usá los controles y el botón “Soltar”.</p>
+  <p class="small" id="predecho">Tu predicción del bloque 1: aún sin elegir.</p>
+  <div class="sim">
+   <canvas id="cv" role="img" aria-label="Péndulo simple: se puede arrastrar la pesa para elegir el ángulo y soltarla"></canvas>
+   <div class="ctrl">
+    <div class="row" style="margin-bottom:10px"><button class="btn" id="go">Soltar</button><button class="btn sec" id="pause">Pausa</button><button class="btn sec" id="rst">Reiniciar</button></div>
+    <div class="line"><span class="lab">Largo</span><button class="btn sec step" data-st="L:-0.05" aria-label="Menos largo">−</button><input type="range" id="L" min="0.10" max="2.00" step="0.01" value="1.00" aria-label="Largo en metros"><button class="btn sec step" data-st="L:0.05" aria-label="Más largo">+</button></div>
+    <div class="line"><span class="lab">Masa</span><button class="btn sec step" data-st="M:-0.05" aria-label="Menos masa">−</button><input type="range" id="M" min="0.05" max="1.00" step="0.05" value="0.50" aria-label="Masa en kilogramos"><button class="btn sec step" data-st="M:0.05" aria-label="Más masa">+</button></div>
+    <div class="line"><span class="lab">Ángulo</span><button class="btn sec step" data-st="A:-1" aria-label="Menos ángulo">−</button><input type="range" id="A" min="5" max="60" step="1" value="10" aria-label="Ángulo inicial en grados"><button class="btn sec step" data-st="A:1" aria-label="Más ángulo">+</button></div>
+    <label for="G" style="margin-top:8px">Gravedad</label>
+    <select id="G"><option value="9.797" selected>Buenos Aires (9,797 m/s²)</option><option value="1.62">Luna (1,62 m/s² · a verificar)</option><option value="3.71">Marte (3,71 m/s² · a verificar)</option><option value="24.79">Júpiter (24,79 m/s² · a verificar)</option><option value="manual">Otra (manual)</option></select>
+    <div id="gman" hidden style="margin-top:8px"><label for="gnum">g manual (1,0 a 25,0 m/s²)</label><input id="gnum" type="number" inputmode="decimal" min="1" max="25" step="0.01" value="9.80" style="width:100%;min-height:48px;font:inherit;padding:8px 12px;background:var(--paper2);border:2px solid var(--line-strong);border-radius:0"></div>
+    <details style="margin-top:8px"><summary>Avanzado: rozamiento</summary>
+     <div class="line" style="padding-top:6px"><span class="lab">Rozamiento</span><button class="btn sec step" data-st="B:-0.05" aria-label="Menos rozamiento">−</button><input type="range" id="B" min="0" max="0.5" step="0.01" value="0" aria-label="Amortiguamiento en 1 sobre segundo"><button class="btn sec step" data-st="B:0.05" aria-label="Más rozamiento">+</button></div>
+     <p class="small" style="margin:0">Con 0 el péndulo no pierde energía.</p></details>
+    <div class="row" style="margin-top:12px"><button class="btn sec" id="chrono">Cronómetro: 10 oscilaciones</button></div>
+   </div>
+   <div class="readout" id="ro" aria-live="off"></div>
+   <div class="readout" id="en" aria-hidden="true">
+    <div>Energía de movimiento <span class="small" id="ec"></span></div><div class="bar"><i id="bec" style="width:0"></i></div>
+    <div>Energía de altura <span class="small" id="ep"></span></div><div class="bar"><i id="bep" style="width:0"></i></div>
+    <div>Total <span class="small" id="et"></span></div><div class="bar"><i id="bet" style="width:0"></i></div>
+   </div>
+  </div>
+  <p id="warn" class="notice" hidden>Con más de 20° la regla ya no es exacta: el período real es un poco mayor.</p>
+  <p style="margin-top:14px"><b>Tres consignas</b> (cambiá, mirá, anotá):</p>
+  <ol class="steps">
+   <li><b>Cambiá la masa</b> de 0,1 a 1,0 kg y mirá el período. Anotá.</li>
+   <li><b>Cambiá el largo</b> a 0,25 m, 1,00 m y 1,50 m. Anotá el período de cada uno y compará con tu predicción.</li>
+   <li><b>Cambiá el ángulo</b> de 10° a 60°. ¿Cambia el período? ¿Cuánto? Mirá la lectura “error de la regla”.</li>
+  </ol>
+  <p class="small">Modelo: péndulo simple, hilo sin masa, sin rozamiento por defecto. La sim integra θ'' = −(g/L)·sen θ − b·θ' con Runge-Kutta de 4º orden (paso 1/240 s). El período “medido” sale de dos cruces consecutivos por la vertical. Los valores de g de otros astros son provisorios.</p>
+ </div></div>
+
+ <!-- B4 -->
+ <div class="block" id="b4"><h3><span class="n">Bloque 4</span> Experimento casero <span class="tag">sin pantalla · 15–20 min</span></h3><div class="in">
+  <p><b>Péndulo con hilo y tuerca.</b> Costo estimado: ARS 1.500 a 3.000 si hay que comprar hilo y tuerca (el tope del plan es USD 5 por experimento) <span class="ej">estimación · a validar</span></p>
+  <p><b>Materiales (5 ítems):</b></p>
+  <ul class="plain">
+   <li>Hilo o piolín (~1,5 m)</li>
+   <li>Una tuerca grande o un llavero (algo pesadito y chico)</li>
+   <li>Cinta de enmascarar</li>
+   <li>Regla o cinta métrica</li>
+   <li>Cronómetro del celular</li>
+  </ul>
+  <p class="small">Además, dos libros para trabar el hilo en el borde de una mesa o una silla.</p>
+  <p><b>Pasos:</b></p>
+  <ol class="steps">
+   <li>Atá la tuerca al hilo y sujetá el otro extremo bajo un libro, en el borde de la mesa.</li>
+   <li>Medí L desde el punto de sujeción hasta el <b>centro</b> de la tuerca.</li>
+   <li>Apartala unos 15° (un ángulo chico) y soltala <b>sin empujar</b>.</li>
+   <li>Cronometrá <b>10 oscilaciones completas</b> y dividí por 10. Repetí 3 veces y promediá.</li>
+   <li>Repetí con L = 25, 50, 75 y 100 cm. Anotá en una tabla.</li>
+   <li>Compará con la simulación (misma g, mismo largo). Lo esperable es que coincidan con una diferencia de 2 a 5 % <span class="ej">estimación</span>.</li>
+   <li>Extra: cambiá la tuerca por dos tuercas atadas juntas. ¿Cambió algo?</li>
+  </ol>
+  <div class="scroll"><table class="tbl" aria-label="Valores de referencia de la regla"><tr><th>L (m)</th><th>Período (s)</th><th>10 oscilaciones (s)</th></tr>
+   <tr><td>0,25</td><td>1,00</td><td>10,0</td></tr><tr><td>0,50</td><td>1,42</td><td>14,2</td></tr><tr><td>0,75</td><td>1,74</td><td>17,4</td></tr><tr><td>1,00</td><td>2,01</td><td>20,1</td></tr><tr><td>1,50</td><td>2,46</td><td>24,6</td></tr></table></div>
+  <p class="small">Calculado con T = 2π√(L/g) y g = 9,797 m/s².</p>
+  <div class="notice"><b>Seguridad:</b> el adulto revisa que el nudo aguante y que nadie esté en la trayectoria de la pesa. No usar objetos filosos como pesas.<br><b>Qué supervisa el adulto:</b> el nudo, la trayectoria y que se cronometren 10 oscilaciones, no una. Cuando el chico predice mal, preguntar “¿cómo podríamos comprobarlo?” y probar con dos tuercas, sin decir “mal”.</div>
+ </div></div>
+
+ <!-- B5 -->
+ <div class="block" id="b5"><h3><span class="n">Bloque 5</span> Preguntas para conversar <span class="tag">sin pantalla · 10 min</span></h3><div class="in">
+  <p class="small" id="predecho2">Tu predicción: aún sin elegir.</p>
+  <p>Leé cada pregunta en voz alta. <b>No hace falta saber la respuesta:</b> está debajo. Marcá ✔ (lo dijo con claridad), ◐ (a medias) o ✘ (hay que volver). No es una nota.</p>
+  <div id="qs"></div>
+  <div class="notice"><b>Error común esperado:</b> creer que “más pesado = más rápido” (o más lento). En el experimento: medir L hasta la tuerca y no hasta su centro, cronometrar una sola oscilación, soltar con un empujón o desde un ángulo grande.</div>
+  <details><summary>Si se traba (qué hacer)</summary>
+   <ol class="steps" style="padding-top:8px">
+    <li>Frená y no sigas: volvé a la predicción y preguntale qué piensa ahora.</li>
+    <li>Probá otro ejemplo concreto con cosas a mano (la hamaca, un reloj de pared, dos tuercas atadas juntas).</li>
+    <li>Pedile que lo explique con sus palabras o que lo dibuje.</li>
+    <li>Repetí el experimento cambiando <b>una sola cosa</b> (solo la masa, o solo el largo).</li>
+    <li>Si sigue sin entender, hacé la lección de repaso de 15 min y reintentá el chequeo con ítems distintos.</li>
+    <li>Si después de 2 intentos no avanza, pedí apoyo desde el panel.</li>
+   </ol>
+   <p class="small">Es normal. Una lección difícil muestra dónde enseñar distinto; no es un fracaso.</p></details>
+ </div></div>
+
+ <!-- B6 -->
+ <div class="block" id="b6"><h3><span class="n">Bloque 6</span> Chequeo de dominio <span class="tag scr">pantalla · 5 min</span></h3><div class="in">
+  <p>5 ítems de esta lección. Con <b>4 o más correctos</b> se avanza. Con 3 o menos: repaso corto de 15 min y nuevo intento con ítems distintos. No se avanza por tiempo. Sin cuenta regresiva.</p>
+  <div id="quiz"></div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="grade">Corregir</button><button class="btn sec" id="resetq">Borrar respuestas</button></div>
+  <div id="res" aria-live="polite"></div>
+  <details style="margin-top:14px"><summary>3 ítems de repaso (lecciones anteriores, no suman)</summary><div id="rev" style="padding-top:8px"></div></details>
+ </div></div>
+</div></section>
+
+<!-- PANEL -->
+<section id="panel"><div class="wrap">
+ <p class="sc">Vista previa · Panel del adulto</p>
+ <h2>En 2 minutos: cómo viene, qué toca, qué comprar, qué hacer</h2>
+ <div class="notice"><span class="ej">Todo ejemplo</span> Datos inventados para mostrar el diseño; no provienen de familias reales. Domus <b>no es un título ni tiene validez oficial</b>; se puede exportar una carpeta con productos y chequeos como evidencia.</div>
+ <div class="panel">
+  <p class="sc">Esta semana · Semana 3 de la Unidad 1 <span class="ej">ejemplo</span></p>
+  <p class="lede" style="margin-bottom:.4em">Dominó 2 de 3 lecciones al primer intento.</p>
+  <p class="small">Toca: lección C el viernes. Compras: ver lista. Domingo: mirar el reporte (2 min).</p>
+
+  <div class="grid c2" style="margin-top:16px">
+   <div class="card"><h3>Progreso por unidad</h3>
+    <ul class="plain" style="list-style:none;padding:0;margin:0">
+     <li>U1 Materia y medición — <b>en curso</b> (semana 3 de 5)</li>
+     <li>U2 Fuerzas y movimiento — por empezar</li>
+     <li>U3 Energía — por empezar</li>
+     <li>U4 Mezclas y cambios — por empezar</li>
+     <li>U5 Electricidad (baja tensión) — por empezar</li>
+     <li>U6 Luz y óptica — por empezar</li>
+    </ul>
+    <p class="small" style="margin-top:8px">Semana 5 de cada unidad: repaso, producto propio y puerta de unidad.</p>
+   </div>
+   <div class="card"><h3>Dominio</h3>
+    <p style="margin-bottom:6px"><span class="sema g"><span class="d">✓</span> Medir masa y volumen: 5/5</span></p>
+    <p style="margin-bottom:6px"><span class="sema y"><span class="d"></span> Estados de la materia: 3/5 · repaso corto</span></p>
+    <p style="margin-bottom:6px"><span class="sema g"><span class="d">✓</span> Densidad: 4/5</span></p>
+    <p class="small">Verde: 4 o 5 de 5 · Amarillo: 3 de 5 (repaso de 15 min) · Rojo: 2 o menos (repasar y reintentar con ítems distintos). Puerta de unidad: 8 de 10, hasta 2 intentos.</p>
+    <p class="small"><span class="sema r"><span class="d">!</span> Rojo</span> se ve así: forma y palabra, no solo color.</p>
+   </div>
+  </div>
+
+  <div class="grid c2" style="margin-top:14px">
+   <div class="card"><h3>Carga horaria de la semana</h3>
+    <p style="margin:0">Chico/a: planificado 165 min · real 140 min <span class="ej">ejemplo</span></p>
+    <div class="bar" role="img" aria-label="Real 140 de 165 minutos planificados"><i style="width:85%"></i><b style="left:100%"></b></div>
+    <p style="margin:0">Adulto: planificado 180 min · real 210 min <span class="ej">ejemplo</span></p>
+    <div class="bar" role="img" aria-label="Real 210 de 180 minutos planificados"><i style="width:100%"></i><b style="left:86%"></b></div>
+    <p class="small">La marca bordó es lo planificado. Pantalla por lección (mediana): 24 min. Pregunta de la semana: “¿cuántos minutos le dedicaste?”. Aviso suave si pasás de 4 h/semana dos veces.</p>
+   </div>
+   <div class="card"><h3>Materiales de la semana</h3>
+    <div class="check"><input type="checkbox" id="mt1" checked><label for="mt1">Aceite de cocina — USD 1,5 <span class="ej">ejemplo</span></label></div>
+    <div class="check"><input type="checkbox" id="mt2"><label for="mt2">Sal fina — USD 0,8 <span class="ej">ejemplo</span></label></div>
+    <div class="check"><input type="checkbox" id="mt3"><label for="mt3">Vaso transparente alto — USD 1,2 <span class="ej">ejemplo</span></label></div>
+    <p style="margin:8px 0 2px">Total de la semana: USD 3,5 · tope por experimento: USD 5</p>
+    <p style="margin:0">Acumulado del curso: USD 11 de 100</p>
+    <div class="bar" role="img" aria-label="11 de 100 dólares"><i style="width:11%"></i></div>
+    <p class="small">“Si no tenés X, usá Y” y nivel de supervisión en cada ítem. Hasta 5 ítems por experimento. Precios a validar y a actualizar en pesos.</p>
+   </div>
+  </div>
+
+  <div class="card" style="margin-top:14px"><h3>Alertas (siempre con una acción)</h3>
+   <div class="alert"><b>Dos semanas sin lecciones.</b> Propuesta: retomar con una lección corta de 20 min. <button class="btn sec" style="min-height:44px;margin-left:6px">Elegir lección</button></div>
+   <div class="alert"><b>Dos chequeos en rojo en el mismo tema.</b> Propuesta: hacer el repaso de 15 min y mirar la guía de ayuda.</div>
+   <div class="alert"><b>Puerta de unidad sin aprobar 2 veces.</b> Propuesta: pedir una sesión de apoyo.</div>
+   <p class="small">Tono informativo, sin reproche ni ranking entre chicos. <span class="ej">ejemplo</span></p>
+  </div>
+  <div class="card" style="margin-top:14px"><h3>Guía de preguntas y “Si se traba”</h3>
+   <p style="margin:0">Cada lección trae sus 5 preguntas con respuesta modelo y una pantalla “Si se traba” (ver Bloque 5 de la lección de arriba). Podés marcar ✔ / ◐ / ✘ por pregunta; no se convierte en nota.</p>
+   <p style="margin:8px 0 0"><a href="#b5" class="btn sec">Ver la guía de muestra</a></p>
+  </div>
+ </div>
+</div></section>
+
+<!-- EDADES -->
+<section id="edades"><div class="wrap">
+ <p class="sc">Mapa por edad</p>
+ <h2>Qué se hace en cada franja</h2>
+ <p>Hoy solo la franja de 10 a 13 años (ciencias) es el piloto. Las demás son <b>esqueletos para validar</b>, no se construyen todavía.</p>
+ <div class="notice"><b>Materias:</b> ciencias duras, historia y lógica. Para la muestra solo hay contenido de ciencias (el mapa de abajo es el de Ciencias); historia está por definirse. Los contenidos fuera del piloto son hipótesis a validar y no se cruzaron con los diseños curriculares de CABA ni de Córdoba.</div>
+ <div class="scroll"><table class="tbl" aria-label="Mapa de materias por edad" style="min-width:760px">
+  <tr><th>Edad</th><th>Matemática</th><th>Física</th><th>Química</th><th>Biología</th><th>Astronomía</th><th>Lógica</th><th>Alumno</th></tr>
+  <tr><td>4–5</td><td>Contar a 20, formas</td><td>Flotar/hundir, sombras</td><td>Disolver (juego)</td><td>Plantas y animales cercanos</td><td>Día/noche</td><td>Clasificar</td><td>1,5 h/sem</td></tr>
+  <tr><td>6–8</td><td>Operaciones concretas, reloj</td><td>Movimiento, imanes</td><td>Estados de la materia</td><td>Seres vivos, cuerpo</td><td>Fases de la Luna</td><td>Secuencias, adivinanzas</td><td>2 h/sem</td></tr>
+  <tr><td>9–12 (piloto 10–13)</td><td>Fracciones, cálculo mental (juego)</td><td><b>U2 fuerzas, U3 péndulo (sim)</b>, U5 circuitos, U6 luz</td><td><b>U1 densidad, U4 ácido/base</b></td><td>Células con lupa, ecosistemas</td><td>Sistema solar, cielo austral</td><td>Silogismos simples</td><td>2,5–3 h/sem</td></tr>
+  <tr><td>13–16</td><td>Álgebra, Pitágoras (sim)</td><td>Cinemática, tiro oblicuo (sim)</td><td>Tabla periódica (sim)</td><td>Célula, herencia</td><td>Órbitas, Kepler</td><td>Lógica proposicional</td><td>4 h/sem</td></tr>
+ </table></div>
+ <p class="small" style="margin:6px 0 16px">Las simulaciones son propias (código nuestro). Cargas horarias según la propuesta pedagógica. Abajo, el detalle de cada franja.</p>
+
+ <details><summary>4–5 años · casi sin pantalla</summary><div style="padding:6px 0 14px">
+  <p><b>Foco:</b> lenguaje oral, sonidos y primeras letras, escribir el propio nombre, contar hasta 10–20, tamaños y espacio, naturaleza cercana.</p>
+  <p><b>Modo:</b> un cuento por unidad (~6 semanas): escuchar, renarrar con imágenes, dramatizar, dibujar. <b>5 sesiones de 15–25 min</b> (≈ 1,5 h).</p>
+  <p><b>Semana de ejemplo:</b> Lun escuchar y renarrar · Mar juego de sonidos y rimas · Mié dibujar el personaje y contar objetos · Jue dramatizar · Vie escribir el nombre y mirar juntos lo hecho.</p>
+  <p class="small">El adulto conduce todo: ~1,5–2 h/semana; preparación 5–10 min por sesión.</p></div></details>
+
+ <details><summary>6–8 años · lectoescritura, números, mundo natural</summary><div style="padding:6px 0 14px">
+  <p><b>Foco:</b> relación sonido–letra, comprensión de cuentos cortos, números con material concreto, reloj y calendario, seres vivos.</p>
+  <p><b>Modo:</b> un cuento corto por semana, con lectura en 4 tiempos y juegos de clasificar y ordenar. <b>4 lecciones de 30–40 min</b> (≈ 2–2,5 h).</p>
+  <p><b>Semana de ejemplo:</b> Lun lectura del cuento · Mar sonidos y escritura de oraciones · Mié matemática con objetos o juego con reglas · Jue mini-experimento u observación + dibujo · Vie renarración oral y repaso.</p>
+  <p class="small">Adulto: lee en voz alta, escucha, marca ✔ ◐ ✘ por lección; 5 min diarios de lectura del chico con atención completa. ~2–2,5 h/semana.</p></div></details>
+
+ <details><summary>9–12 años · esqueleto general</summary><div style="padding:6px 0 14px">
+  <p><b>Foco:</b> ciencias, matemática por problemas y juegos, lectura de libros completos, un proyecto con producto por unidad.</p>
+  <p><b>Modo:</b> preguntas y experimentos, juegos con reglas, lectura silenciosa con notas, debate corto en familia.</p>
+  <p><b>Carga:</b> chico 2,5–3 h/semana. El adulto pregunta, escucha y supervisa experimentos.</p></div></details>
+
+ <details open><summary>10–13 años · piloto de ciencias</summary><div style="padding:6px 0 14px">
+  <p><b>3 lecciones por semana</b> de 45–60 min (≈ 2,5–3 h) + 1 sesión opcional de repaso o mini-proyecto de 45 min.</p>
+  <p><b>Ritmo:</b> Lun lección A · Mié lección B · Vie lección C (+ puerta de unidad si toca) · Dom el adulto mira el reporte (2 min). Lista de compras única los viernes, máximo 5 ítems por experimento.</p>
+  <p><b>Adulto:</b> preparación ≤ 10 min por lección; ≈ 2,5–3,5 h/semana en total, de las cuales ~1 h es activa. <b>Pantalla del chico:</b> ≈ 25 min por lección.</p>
+  <div class="scroll"><table class="tbl" aria-label="Unidades del piloto">
+   <tr><th>Unidad</th><th>Sem.</th><th>Experimento de ejemplo</th></tr>
+   <tr><td>U1 Materia y medición</td><td>1–5</td><td>Flotar y hundir con agua, aceite y sal</td></tr>
+   <tr><td>U2 Fuerzas y movimiento</td><td>6–10</td><td>Rampas con libros y autitos</td></tr>
+   <tr><td>U3 Energía</td><td>11–15</td><td>Péndulo con hilo y tuerca</td></tr>
+   <tr><td>U4 Mezclas y cambios</td><td>16–20</td><td>Repollo colorado como indicador</td></tr>
+   <tr><td>U5 Electricidad (baja tensión)</td><td>21–25</td><td>Pila, cables y LED</td></tr>
+   <tr><td>U6 Luz y óptica</td><td>26–30</td><td>Lupa con agua, espejos, sombras</td></tr>
+  </table></div>
+  <p class="small">30 semanas + 4 de colchón para feriados, enfermedad y repaso. La semana 5 de cada unidad: repaso, producto propio (afiche, mini-informe, exposición de 3 min, video corto o cuaderno de experimentos) y puerta de unidad. Sin fuego abierto, corrosivos ni electricidad de red.</p></div></details>
+
+ <details><summary>13–16 años · más autonomía</summary><div style="padding:6px 0 14px">
+  <p><b>Foco:</b> física y química con álgebra básica, lectura analítica y escritura argumentada.</p>
+  <p><b>Modo:</b> contrato semanal, entregas escritas, discusión de lecturas. <b>Carga del chico:</b> ~4 h/semana.</p>
+  <p class="small">El adulto supervisa el reporte, conversa y ayuda a ordenar el uso de pantallas con límites claros.</p></div></details>
+</div></section>
+
+<!-- PLANES -->
+<section id="planes"><div class="wrap">
+ <p class="sc">Planes · borrador</p>
+ <h2>Tres formas de empezar</h2>
+ <p>Los precios todavía no existen: <b>a validar</b> con familias. Ninguna opción otorga título ni validez oficial.</p>
+ <div class="grid c3">
+  <div class="card"><h3>Muestra</h3><p class="num"><b>Precio: a validar</b></p><ul class="plain"><li>Una lección completa</li><li>Guía de preguntas</li><li>Sin panel</li></ul></div>
+  <div class="card"><h3>Familia · una materia</h3><p><b>Precio: a validar</b></p><ul class="plain"><li>Lecciones de una materia</li><li>Panel del adulto</li><li>Listas de compras</li></ul></div>
+  <div class="card"><h3>Familia · completo</h3><p><b>Precio: a validar</b></p><ul class="plain"><li>Todas las materias disponibles</li><li>Varios hijos</li><li>Carpeta de evidencias</li></ul></div>
+ </div>
+ <p class="small" style="margin-top:12px">El contenido de cada plan puede cambiar según lo que aprendamos del piloto.</p>
+</div></section>
+
+<!-- LISTA DE ESPERA -->
+<section id="espera"><div class="wrap">
+ <p class="sc">Lista de espera</p>
+ <h2>Avisame cuando esté listo</h2>
+ <p>Este formulario es una maqueta: <b>no envía ni guarda nada</b> en ningún servidor ni en tu dispositivo. La confirmación es solo local.</p>
+ <form id="wl" novalidate style="max-width:460px">
+  <label for="em">Correo electrónico</label>
+  <input id="em" type="email" inputmode="email" autocomplete="email" aria-describedby="emerr" placeholder="nombre@ejemplo.com">
+  <p id="emerr" role="alert" style="color:var(--acc);font-weight:500;margin:6px 0 0"></p>
+  <label for="ed" style="margin-top:14px">Edad de tus hijos (opcional)</label>
+  <select id="ed"><option value="">Prefiero no decirlo</option><option>4–5</option><option>6–8</option><option>9–12</option><option>10–13</option><option>13–16</option></select>
+  <div style="margin-top:16px"><button class="btn" type="submit">Anotarme</button></div>
+ </form>
+ <div id="wlok" class="notice" hidden aria-live="polite"></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+ <p><b>Domus</b> — prototipo de validación, contenido en borrador. Complemento de estudio en casa: <b>no otorga título ni tiene validez oficial</b>. Simulación y dibujos propios, sin recursos externos. Los números marcados “ejemplo” no son datos reales.</p>
+</div></footer>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var fmt=function(n,d){return n.toFixed(d).replace('.',',')};
+
+/* Predicción */
+var pA='',pB='';
+function predUpdate(){
+ var parts=[];if(pA)parts.push('A: “'+pA+'”');if(pB)parts.push('B: “'+pB+'”');
+ var t=parts.length?'Tu predicción — '+parts.join(' · ')+'.':'Tu predicción: aún sin elegir.';
+ $('#predmsg').textContent=parts.length?'Anotado. '+parts.join(' · ')+'. Lo retomamos en la simulación y en las preguntas.':'Todavía no elegiste. Cualquier respuesta sirve: es para comparar después.';
+ $('#predecho').textContent=t;$('#predecho2').textContent=t;
+}
+function chipGroup(attr,set){$$('['+attr+']').forEach(function(b){b.addEventListener('click',function(){
+ set(b.getAttribute(attr));
+ $$('['+attr+']').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});predUpdate();
+});});}
+chipGroup('data-pa',function(v){pA=v});chipGroup('data-pb',function(v){pB=v});
+
+/* Simulación del péndulo (modelo propio) */
+var D2R=Math.PI/180,DT=1/240;
+function accel(th,w,g,L,b){return -(g/L)*Math.sin(th)-b*w}
+function rk4(th,w,g,L,b,dt){
+ var k1t=w,k1w=accel(th,w,g,L,b);
+ var k2t=w+dt/2*k1w,k2w=accel(th+dt/2*k1t,w+dt/2*k1w,g,L,b);
+ var k3t=w+dt/2*k2w,k3w=accel(th+dt/2*k2t,w+dt/2*k2w,g,L,b);
+ var k4t=w+dt*k3w,k4w=accel(th+dt*k3t,w+dt*k3w,g,L,b);
+ return[th+dt/6*(k1t+2*k2t+2*k3t+k4t),w+dt/6*(k1w+2*k2w+2*k3w+k4w)];
+}
+/* ayuda para pruebas: período medido sin dibujar */
+window.__domusTest={measure:function(L,g,deg){
+ var th=deg*D2R,w=0,t=0,last=null,T=null,i,r,tp;
+ for(i=0;i<240*30;i++){tp=th;r=rk4(th,w,g,L,0,DT);th=r[0];w=r[1];t+=DT;
+  if(tp<0&&th>=0){var tc=t-DT+DT*(-tp)/(th-tp);if(last!==null){T=tc-last;break}last=tc}}
+ return T}};
+
+var cv=$('#cv'),ctx=cv.getContext('2d');
+var eL=$('#L'),eM=$('#M'),eA=$('#A'),eG=$('#G'),eGn=$('#gnum'),eB=$('#B'),ro=$('#ro');
+var W=300,H=360,dpr=1;
+var S={th:10*D2R,w:0,mode:'ready',t:0,last:null,Tm:null,chr:null,chrRes:null,drag:false,acc:0,sign:1};
+var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function gval(){
+ if(eG.value==='manual'){var g=parseFloat(String(eGn.value).replace(',','.'));if(!isFinite(g))g=9.797;return Math.max(1,Math.min(25,g))}
+ return parseFloat(eG.value)}
+function par(){return{L:+eL.value,m:+eM.value,a:+eA.value,g:gval(),b:+eB.value}}
+function fmt2(n,d){return n.toFixed(d).replace('.',',')}
+function ppm(){return (H-24-34)/2.0}
+function bobPos(){var p=par(),Lp=p.L*ppm();return{x:W/2+Lp*Math.sin(S.th),y:24+Lp*Math.cos(S.th),r:11+13*Math.sqrt(p.m)}}
+function resize(){
+ var r=cv.getBoundingClientRect();W=r.width;H=r.height;
+ dpr=window.devicePixelRatio||1;
+ cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);draw();
+}
+function resetSim(){S.th=S.sign*par().a*D2R;S.w=0;S.mode='ready';S.t=0;S.last=null;S.Tm=null;S.chr=null;S.chrRes=null;$('#pause').textContent='Pausa';draw();readout()}
+function release(){S.mode='run';S.w=0;S.last=null}
+function step(){
+ var p=par(),tp=S.th,r=rk4(S.th,S.w,p.g,p.L,p.b,DT);
+ S.th=r[0];S.w=r[1];S.t+=DT;
+ if(tp<0&&S.th>=0){
+  var tc=S.t-DT+DT*(-tp)/(S.th-tp);
+  if(S.last!==null)S.Tm=tc-S.last;S.last=tc;
+  if(S.chr){
+   if(S.chr.start===null){S.chr.start=tc;S.chr.n=0}
+   else{S.chr.n++;if(S.chr.n>=10){S.chrRes=tc-S.chr.start;S.chr=null}}
+  }
+ }
+}
+function draw(){
+ var p=par(),px=W/2,py=24,b=bobPos(),Lp=p.L*ppm();
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#fbf9f3';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#8a8372';ctx.lineWidth=1.5;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,py+Lp+30);ctx.stroke();ctx.setLineDash([]);
+ // arco del ángulo
+ var ang=S.th,ar=Math.min(46,Lp*0.5);
+ ctx.strokeStyle='#6e1e1e';ctx.lineWidth=2;ctx.beginPath();
+ ctx.arc(px,py,ar,Math.PI/2,Math.PI/2-ang,ang>0);ctx.stroke();
+ // hilo
+ ctx.strokeStyle='#1b1a17';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(b.x,b.y);ctx.stroke();
+ // soporte
+ ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(px-W*0.3,py-4);ctx.lineTo(px+W*0.3,py-4);ctx.stroke();
+ // pesa
+ ctx.fillStyle='#f6f3ea';ctx.strokeStyle='#6e1e1e';ctx.lineWidth=3;
+ ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();ctx.stroke();
+ if(S.mode==='ready'||S.drag){ctx.fillStyle='#1b1a17';ctx.font='15px system-ui,sans-serif';ctx.textAlign='center';
+  ctx.fillText('arrastrame',b.x,Math.min(H-8,b.y+b.r+20))}
+ ctx.fillStyle='#1b1a17';ctx.font='16px system-ui,sans-serif';ctx.textAlign='left';
+ ctx.fillText('ángulo: '+Math.round(Math.abs(S.th)/D2R)+'°',10,H-10);
+ ctx.textAlign='right';ctx.fillText('t = '+fmt2(S.t,1)+' s',W-10,H-10);
+}
+var ro_n=0;
+function readout(){
+ var p=par(),T0=2*Math.PI*Math.sqrt(p.L/p.g);
+ var txt='Período de la regla: '+fmt2(T0,3)+' s · ';
+ if(S.Tm!==null){var e=(S.Tm-T0)/T0*100;txt+='medido: '+fmt2(S.Tm,3)+' s · error de la regla: '+fmt2(e,2)+' %'}
+ else txt+='medido: — (soltá el péndulo y esperá dos pasos por el centro)';
+ if(S.chrRes!==null)txt+=' · 10 oscilaciones: '+fmt2(S.chrRes,2)+' s → '+fmt2(S.chrRes/10,3)+' s cada una';
+ else if(S.chr)txt+=' · cronómetro en marcha…';
+ ro.textContent=txt;
+ $('#warn').hidden=!(p.a>20);
+}
+function energy(){
+ var p=par(),Ec=0.5*p.m*p.L*p.L*S.w*S.w,Ep=p.m*p.g*p.L*(1-Math.cos(S.th)),sc=p.m*p.g*p.L*(1-Math.cos(60*D2R));
+ function pc(x){return Math.max(0,Math.min(100,x/sc*100))+'%'}
+ $('#bec').style.width=pc(Ec);$('#bep').style.width=pc(Ep);$('#bet').style.width=pc(Ec+Ep);
+ $('#ec').textContent=fmt2(Ec,3)+' J';$('#ep').textContent=fmt2(Ep,3)+' J';$('#et').textContent=fmt2(Ec+Ep,3)+' J';
+}
+function frame(ts){
+ if(S.prevTs==null)S.prevTs=ts;
+ var dt=Math.min(0.05,(ts-S.prevTs)/1000);S.prevTs=ts;
+ if(S.mode==='run'){
+  if(reduce){for(var i=0;i<4;i++)step()}
+  else{S.acc+=dt;var n=0;while(S.acc>=DT&&n<24){step();S.acc-=DT;n++}if(n>=24)S.acc=0}
+ }
+ draw();energy();
+ if((++ro_n%6)===0)readout();
+ requestAnimationFrame(frame);
+}
+/* arrastre táctil / mouse */
+function pos(e){var r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+cv.addEventListener('pointerdown',function(e){
+ var b=bobPos(),p=pos(e),hit=Math.max(b.r+26,34);
+ if(Math.hypot(p.x-b.x,p.y-b.y)<=hit){
+  S.drag=true;S.mode='ready';S.w=0;S.Tm=null;S.last=null;S.chr=null;S.chrRes=null;S.t=0;
+  try{cv.setPointerCapture(e.pointerId)}catch(_){}
+  e.preventDefault();
+ }
+});
+cv.addEventListener('pointermove',function(e){
+ if(!S.drag)return;
+ var p=pos(e),dx=p.x-W/2,dy=Math.max(4,p.y-24),th=Math.atan2(dx,dy);
+ var a=Math.abs(th)/D2R;a=Math.max(5,Math.min(60,a));
+ S.sign=th<0?-1:1;S.th=S.sign*a*D2R;eA.value=Math.round(a);readout();
+});
+function endDrag(){if(!S.drag)return;S.drag=false;release()}
+cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
+$('#go').addEventListener('click',function(){if(S.mode==='ready')release();else if(S.mode==='paused')S.mode='run'});
+$('#pause').addEventListener('click',function(){
+ if(S.mode==='run'){S.mode='paused';this.textContent='Seguir'}
+ else if(S.mode==='paused'){S.mode='run';this.textContent='Pausa'}
+});
+$('#rst').addEventListener('click',resetSim);
+$('#chrono').addEventListener('click',function(){
+ S.chrRes=null;S.chr={start:null,n:0};if(S.mode==='ready')release();if(S.mode==='paused'){S.mode='run';$('#pause').textContent='Pausa'}readout();
+});
+eA.addEventListener('input',resetSim);
+[eL,eM,eB].forEach(function(el){el.addEventListener('input',function(){S.Tm=null;S.last=null;S.chrRes=null;S.chr=null;if(S.mode==='ready'){draw()}readout()})});
+eG.addEventListener('change',function(){$('#gman').hidden=eG.value!=='manual';S.Tm=null;S.last=null;readout()});
+eGn.addEventListener('input',function(){S.Tm=null;S.last=null;readout()});
+$$('[data-st]').forEach(function(b){b.addEventListener('click',function(){
+ var s=b.getAttribute('data-st').split(':'),el=$('#'+s[0]);
+ var v=Math.max(+el.min,Math.min(+el.max,Math.round((+el.value+ +s[1])*100)/100));
+ el.value=v;el.dispatchEvent(new Event('input'));
+});});
+window.addEventListener('resize',resize);
+resize();resetSim();requestAnimationFrame(frame);
+
+/* Preguntas */
+var QS=[
+ ['Predicción vs. resultado','¿Qué pensabas que iba a pasar con la tuerca más pesada y qué pasó?','La tuerca pesada no fue ni más rápida ni más lenta: en la regla T = 2π√(L/g) la masa no aparece. Con más masa la gravedad tira más fuerte, pero también cuesta más moverla, y se compensan (para 10–13 alcanza con “se compensan”).','Entendió: dice que lo probó y no cambió.','Repasar: sigue creyendo que cambia → repetir el extra del experimento con dos tuercas.'],
+ ['Explicación propia','Explicámelo como si yo tuviera 6 años: ¿de qué depende cuánto tarda el vaivén?','Cuanto más largo el hilo, más despacio va y viene. El peso no cambia nada. (Borrador de Diseño, a revisar por Ciencias.)','Entendió: nombra el largo y dice que la masa no influye.','Repasar: dice “del peso” o no distingue largo de ángulo.'],
+ ['Variación','Si el hilo mide 25 cm y lo cambiás por uno de 1 m, ¿cuánto tarda ahora una oscilación?','El largo se multiplicó por 4, así que el período se multiplica por √4 = 2: de ~1,0 s a ~2,0 s.','Entendió: dice “el doble” y lo relaciona con cuadruplicar.','◐ si dice “cuatro veces”. Repasar la tabla de la simulación.'],
+ ['Límite','¿Cuándo deja de servir la regla del período?','Cuando el ángulo es grande: a 60° el período real es un 7 % mayor que el de la regla; hasta unos 20° el error es menor al 1 %. (Borrador de Diseño, a revisar por Ciencias.)','Entendió: nombra el ángulo grande como límite.','Repasar: cree que la regla siempre es exacta; probar 10° y 60° en la simulación.'],
+ ['Conexión','Se quiere un péndulo que tarde exactamente 2 s en ir y volver. ¿Cuánto debe medir el hilo?','L = g·T²/(4π²) = 9,797 × 4 / 39,48 ≈ 0,99 m, casi 1 metro. Se puede comprobar con la simulación y con el hilo.','Entendió: llega a ≈1 m probando con la sim aunque no use la fórmula.','◐ usa la fórmula con ayuda. Repasar: volver a la pregunta 3.']
+];
+var qd=$('#qs');
+QS.forEach(function(q,i){
+ var d=document.createElement('div');d.className='q';
+ d.innerHTML='<p style="margin:0"><b>'+(i+1)+'. '+q[0]+'</b></p><p style="margin:4px 0">“'+q[1]+'”</p>'+
+ '<details><summary>Respuesta modelo y señales</summary><p style="padding-top:6px">'+q[2]+'</p><p class="small" style="color:var(--ink)">✔ '+q[3]+'<br>↻ '+q[4]+'</p></details>'+
+ '<div class="mark" role="group" aria-label="Marcar pregunta '+(i+1)+'"><button class="chip" aria-pressed="false">✔ Claro</button><button class="chip" aria-pressed="false">◐ A medias</button><button class="chip" aria-pressed="false">✘ Volver</button></div>';
+ qd.appendChild(d);
+});
+qd.addEventListener('click',function(e){
+ var b=e.target.closest('.chip');if(!b)return;
+ $$('.chip',b.parentNode).forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+});
+
+/* Chequeo */
+var QZ=[
+ {q:'El período de un péndulo con ángulo chico depende…',o:['de la masa','del largo del hilo','de la masa y del largo por igual'],a:1,e:'En T = 2π√(L/g) aparece el largo, no la masa. Si dudás, probalo en la simulación cambiando una sola cosa por vez.'},
+ {q:'Si el largo del hilo se cuadruplica, el período…',o:['se duplica','se cuadruplica','queda igual'],a:0,e:'El largo está dentro de una raíz: √4 = 2. Para duplicar el período hay que cuadruplicar el largo.'},
+ {q:'Con un hilo de 50 cm, 10 oscilaciones tardan aproximadamente…',o:['7 s','14 s','20 s'],a:1,e:'Con L = 0,50 m el período es ≈ 1,42 s; 10 oscilaciones son ≈ 14,2 s.'},
+ {q:'¿Por qué se cronometran 10 oscilaciones y no una sola?',o:['Porque el error de apretar el cronómetro se reparte entre las 10','Porque así el péndulo va más lento','Porque una oscilación no se puede medir'],a:0,e:'Apretar el botón siempre tiene un pequeño retraso. Repartido entre 10 oscilaciones, pesa 10 veces menos en cada una.'},
+ {q:'Dos péndulos con el mismo hilo y ángulo chico: uno con una tuerca de 50 g y otro con una de 200 g. ¿Cuál tarda menos en una oscilación?',o:['El de 50 g','El de 200 g','Tardan igual'],a:2,e:'La masa no aparece en la regla del período. Se puede comprobar con la simulación o con una y dos tuercas atadas.'}
+];
+var REV=[
+ {q:'¿Qué mide la densidad?',o:['Cuánta masa hay por cada unidad de volumen','Cuánto pesa un objeto','El tamaño de un objeto'],a:0,e:'Es masa dividida por volumen. Por eso un objeto grande puede ser poco denso.'},
+ {q:'¿Qué instrumento sirve para medir el volumen de un líquido?',o:['Balanza','Probeta o vaso medidor','Regla'],a:1,e:'La probeta tiene marcas de volumen. La balanza mide masa.'},
+ {q:'Un objeto tiene una densidad de 0,5 g/cm³. En agua (1 g/cm³)…',o:['flota','se hunde','queda en el fondo'],a:0,e:'Es menos denso que el agua, así que flota.'}
+];
+function build(list,host){
+ host.innerHTML='';
+ list.forEach(function(it,i){
+  var d=document.createElement('div');d.className='q';d.setAttribute('data-i',i);
+  var h='<p style="margin:0 0 6px"><b>'+(i+1)+'.</b> '+it.q+'</p><div role="radiogroup" aria-label="Ítem '+(i+1)+'">';
+  it.o.forEach(function(o,j){h+='<button type="button" class="chip opt" role="radio" aria-checked="false" data-j="'+j+'">'+o+'</button>'});
+  h+='</div><div class="fb-host"></div>';d.innerHTML=h;host.appendChild(d);
+ });
+}
+function pick(host){host.addEventListener('click',function(e){
+ var b=e.target.closest('.opt');if(!b)return;
+ $$('.opt',b.parentNode).forEach(function(x){x.setAttribute('aria-checked',x===b?'true':'false');x.setAttribute('aria-pressed',x===b?'true':'false')});
+});}
+build(QZ,$('#quiz'));build(REV,$('#rev'));pick($('#quiz'));pick($('#rev'));
+function grade(list,host){
+ var ok=0,none=0;
+ $$('.q',host).forEach(function(d,i){
+  var sel=$$('.opt',d).filter(function(x){return x.getAttribute('aria-checked')==='true'})[0];
+  var fb=$('.fb-host',d);
+  if(!sel){none++;fb.innerHTML='<div class="fb bad">Falta responder esta pregunta.</div>';return}
+  var good=+sel.getAttribute('data-j')===list[i].a;
+  if(good)ok++;
+  fb.innerHTML='<div class="fb'+(good?'':' bad')+'"><b>'+(good?'✔ Bien. ':'✘ Pensemos juntos. ')+'</b>'+list[i].e+'</div>';
+ });
+ return{ok:ok,none:none};
+}
+$('#grade').addEventListener('click',function(){
+ var r=grade(QZ,$('#quiz')),res=$('#res');
+ if(r.none){res.innerHTML='<div class="notice">Respondé los '+QZ.length+' ítems para corregir. Faltan '+r.none+'.</div>';return}
+ if(r.ok>=4)res.innerHTML='<div class="notice"><b>'+r.ok+' de 5: lección dominada.</b> Podés pasar a la siguiente. Si hubo un error, mirá la explicación de ese ítem.</div>';
+ else res.innerHTML='<div class="notice" style="border-color:var(--acc)"><b>'+r.ok+' de 5: todavía no.</b> Es normal y no es un fracaso. Siguiente paso: una lección de repaso de 15 min con otro ejemplo (por ejemplo, repetir el experimento cambiando una sola cosa) y reintentar con ítems distintos. Si después de 2 intentos no avanza, se pide apoyo desde el panel.</div>';
+});
+$('#resetq').addEventListener('click',function(){build(QZ,$('#quiz'));$('#res').innerHTML=''});
+$('#rev').addEventListener('click',function(e){if(e.target.closest('.opt'))grade(REV,$('#rev'))});
+
+/* Lista de espera */
+$('#wl').addEventListener('submit',function(e){
+ e.preventDefault();
+ var v=$('#em').value.trim(),err=$('#emerr'),ok=$('#wlok');
+ var re=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+ if(!re.test(v)||v.length>254){err.textContent='Escribí un correo válido, por ejemplo nombre@ejemplo.com.';ok.hidden=true;$('#em').setAttribute('aria-invalid','true');$('#em').focus();return}
+ err.textContent='';$('#em').removeAttribute('aria-invalid');
+ ok.hidden=false;ok.textContent='✔ Listo (confirmación local). Este prototipo no guardó ni envió tu correo a ningún lado.';
+ $('#wl').reset();
+});
+})();
+</script>
+</body>
+</html>
