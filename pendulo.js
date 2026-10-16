@@ -33,7 +33,7 @@ var W=300,H=360,dpr=1;
 var S={th:10*D2R,w:0,mode:'ready',t:0,last:null,Tm:null,chr:null,chrRes:null,drag:false,acc:0,sign:1};
 var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function gval(){
- if(eG.value==='manual'){var g=parseFloat(String(eGn.value).replace(',','.'));if(!isFinite(g))g=9.797;return Math.max(1,Math.min(25,g))}
+ if(eG.value==='manual'){var g=parseFloat(String(eGn.value).replace(',','.'));if(!isFinite(g))g=9.8;return Math.max(1,Math.min(25,g))}
  return parseFloat(eG.value)}
 function par(){return{L:+eL.value,m:+eM.value,a:+eA.value,g:gval(),b:+eB.value}}
 function fmt2(n,d){return n.toFixed(d).replace('.',',')}

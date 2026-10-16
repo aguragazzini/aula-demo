@@ -7,7 +7,7 @@ var QS=[
  ['Explicación propia','Explicámelo como si yo tuviera 6 años: ¿de qué depende cuánto tarda el vaivén?','Cuanto más largo el hilo, más despacio va y viene. El peso no cambia nada.','Entendió: nombra el largo y dice que la masa no influye.','Repasar: dice “del peso” o no distingue largo de ángulo.'],
  ['Variación','Si el hilo mide 25 cm y lo cambiás por uno de 1 m, ¿cuánto tarda ahora una oscilación?','El largo se multiplicó por 4, así que el período se multiplica por √4 = 2: de ~1,0 s a ~2,0 s.','Entendió: dice “el doble” y lo relaciona con cuadruplicar.','◐ si dice “cuatro veces”. Repasar la tabla de referencia del experimento.'],
  ['Límite','¿Cuándo deja de servir la regla del período?','Cuando el ángulo es grande: a 60° el período real es un 7 % mayor que el de la regla; hasta unos 20° el error es menor al 1 %.','Entendió: nombra el ángulo grande como límite.','Repasar: cree que la regla siempre es exacta; probar 10° y 60° en la simulación, en el próximo rato de pantalla.'],
- ['Conexión','Se quiere un péndulo que tarde exactamente 2 s en ir y volver. ¿Cuánto debe medir el hilo?','L = g·T²/(4π²) = 9,797 × 4 / 39,48 ≈ 0,99 m, casi 1 metro. Se puede comprobar con el hilo (y después, con la simulación).','Entendió: llega a ≈1 m probando con la sim aunque no use la fórmula.','◐ usa la fórmula con ayuda. Repasar: volver a la pregunta 3.']
+ ['Conexión','Se quiere un péndulo que tarde exactamente 2 s en ir y volver. ¿Cuánto debe medir el hilo?','L = g·T²/(4π²) = 9,8 × 4 / 39,48 ≈ 0,99 m, casi 1 metro. Se puede comprobar con el hilo (y después, con la simulación).','Entendió: llega a ≈1 m probando con la sim aunque no use la fórmula.','◐ usa la fórmula con ayuda. Repasar: volver a la pregunta 3.']
 ];
 var qd=$('#qs');
 QS.forEach(function(q,i){
@@ -64,35 +64,36 @@ function grade(list,host){
 $('#grade').addEventListener('click',function(){
  var r=grade(QZ,$('#quiz')),res=$('#res');
  if(r.none){res.innerHTML='<div class="notice">Respondé los '+QZ.length+' ítems para corregir. Faltan '+r.none+'.</div>';return}
+ if(window.Estado)Estado.chequeo('pendulo',r.ok);
  if(r.ok>=4)res.innerHTML='<div class="notice"><span class="sema g"><span class="d">✓</span> '+r.ok+' de 5: lección dominada.</span><br>Podés pasar a la siguiente. Si hubo un error, mirá la explicación de ese ítem.</div>';
- else if(r.ok===3)res.innerHTML='<div class="notice"><span class="sema y"><span class="d"></span> 3 de 5: casi.</span><br>Hacé un repaso corto de 15 min con otro ejemplo (por ejemplo, repetir una medición con una sola cosa distinta) y reintentá con ítems distintos.</div>';
- else res.innerHTML='<div class="notice" style="border-color:var(--acc)"><span class="sema r"><span class="d">!</span> '+r.ok+' de 5: conviene volver a la lección.</span><br>Es normal y no es un fracaso. Releé el texto, repetí el experimento cambiando una sola cosa y mirá “Si se traba”. Después reintentá con ítems distintos. Si después de 2 intentos no avanza, se pide apoyo desde el panel.</div>';
+ else if(r.ok===3)res.innerHTML='<div class="notice"><span class="sema y"><span class="d"></span> 3 de 5: casi.</span><br>Hacé un repaso corto de 15 min con otro caso (repetir una medición con una sola cosa distinta) y reintentá.</div>';
+ else res.innerHTML='<div class="notice" style="border-color:var(--acc)"><span class="sema r"><span class="d">!</span> '+r.ok+' de 5: conviene volver a la lección.</span><br>Es normal y no es un fracaso. Releé el texto, repetí el experimento cambiando una sola cosa y mirá “Si se traba”. Después reintentá. Si después de 2 intentos no avanza, se pide apoyo desde el panel.</div>';
 });
 $('#resetq').addEventListener('click',function(){build(QZ,$('#quiz'));$('#res').innerHTML=''});
 $('#rev').addEventListener('click',function(e){if(e.target.closest('.opt'))grade(REV,$('#rev'))});
 
-/* Puerta de unidad (maqueta: 10 ítems, 8/10, máx. 2 intentos) */
+/* Puerta de unidad (10 ítems, 8/10, máx. 2 intentos) */
 var GT=QZ.concat([
- {q:'Se quiere un péndulo que tarde 2 s por oscilación (g = 9,797 m/s²). El hilo debe medir aproximadamente…',o:['0,5 m','1 m','2 m'],a:1,e:'L = g·T²/(4π²) ≈ 0,99 m, casi 1 metro.'},
+ {q:'Se quiere un péndulo que tarde 2 s por oscilación (g = 9,8 m/s²). El hilo debe medir aproximadamente…',o:['0,5 m','1 m','2 m'],a:1,e:'L = g·T²/(4π²) ≈ 0,99 m, casi 1 metro.'},
  {q:'Se suelta el péndulo desde 60° en vez de 10°. El período real es…',o:['igual al de la regla','un poco mayor que el de la regla (≈ 7 %)','mucho menor'],a:1,e:'A ángulos grandes la regla deja de ser exacta; a 60° el período real es ≈ 7 % mayor.'},
  {q:'El mismo péndulo, en la Luna (gravedad menor) que en la Tierra, oscila…',o:['más rápido','igual','más lento'],a:2,e:'En T = 2π√(L/g), una g menor da un T mayor.'},
  {q:'Sin rozamiento, la energía total del péndulo…',o:['se mantiene constante','crece con el tiempo','se pierde de a poco'],a:0,e:'Sin rozamiento, la energía solo pasa de altura a movimiento y viceversa; el total no cambia.'},
  {q:'¿En qué punto la energía de movimiento es la mayor?',o:['En los extremos','En el punto más bajo','Es igual en todos'],a:1,e:'En el punto más bajo la pesa va más rápido: ahí casi toda la energía es de movimiento.'}
 ]);
-var gAtt=0,gDone=false;
+var P0=window.Estado&&Estado.progreso(),gAtt=P0&&P0.puerta?P0.puerta.intentos:0,gDone=P0&&P0.puerta?(P0.puerta.ok||P0.puerta.intentos>=2):false;
 function gStat(){$('#gstat').textContent='Intentos usados: '+gAtt+' de 2. Umbral: 8 de 10.'}
 function gBuild(){build(GT,$('#gate'));gStat()}
 gBuild();pick($('#gate'));
 $('#gradeG').addEventListener('click',function(){
  var res=$('#resG');
- if(gDone){res.innerHTML='<div class="notice">Ya usaste los 2 intentos. Usá “Empezar de nuevo” solo para probar la maqueta.</div>';return}
+ if(gDone){res.innerHTML='<div class="notice">Esta puerta ya está cerrada para este hijo o hija. Si necesitás una sesión de apoyo, se pide desde el panel de la familia.</div>';return}
  var r=grade(GT,$('#gate'));
  if(r.none){res.innerHTML='<div class="notice">Respondé los 10 ítems. Faltan '+r.none+'.</div>';return}
- gAtt++;gStat();
+ gAtt++;gStat();if(window.Estado)Estado.puerta(gAtt,r.ok>=8,r.ok);
  if(r.ok>=8){gDone=true;res.innerHTML='<div class="notice"><span class="sema g"><span class="d">✓</span> '+r.ok+' de 10: puerta superada.</span><br>La unidad se cierra. Seguí con la siguiente cuando quieras.</div>'}
  else if(gAtt<2){res.innerHTML='<div class="notice"><span class="sema '+(r.ok>=6?'y':'r')+'"><span class="d">'+(r.ok>=6?'':'!')+'</span> '+r.ok+' de 10: todavía no. Te queda 1 intento.</span><br>Repasá las lecciones con semáforo amarillo o rojo antes de reintentar. Nada se pierde por intentar.</div>'}
  else{gDone=true;res.innerHTML='<div class="notice" style="border-color:var(--acc)"><span class="sema r"><span class="d">!</span> '+r.ok+' de 10: usaste los 2 intentos.</span><br>Se le avisa al adulto y se ofrece una sesión de apoyo. No se avanza por tiempo.</div>'}
 });
-$('#resetG').addEventListener('click',function(){gAtt=0;gDone=false;gBuild();$('#resG').innerHTML=''});
+if(gDone&&P0&&P0.puerta){$('#resG').innerHTML=P0.puerta.ok?'<div class="notice"><span class="sema g"><span class="d">✓</span> '+P0.puerta.pt+' de 10: puerta superada.</span></div>':'<div class="notice" style="border-color:var(--acc)"><span class="sema r"><span class="d">!</span> '+P0.puerta.pt+' de 10: usaste los 2 intentos.</span><br>Se ofrece una sesión de apoyo.</div>'}
 
 })();

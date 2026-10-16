@@ -1,4 +1,4 @@
-/* Domus · maqueta. Utilidades compartidas. Sin dependencias ni red. */
+/* Domus. Utilidades compartidas. Sin dependencias ni red. */
 (function(){
 'use strict';
 var dummy={addEventListener:function(){},querySelector:function(){return dummy},querySelectorAll:function(){return[]},appendChild:function(){},setAttribute:function(){},removeAttribute:function(){},style:{},classList:{toggle:function(){}},innerHTML:'',textContent:'',value:'',hidden:false,reset:function(){},focus:function(){}};
@@ -30,7 +30,7 @@ if(dlg){
 var mini=document.getElementById('mini');
 if(mini){
  var x=mini.getContext('2d'),W=0,H=0,reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches,t0=performance.now();
- var L=1.2,g=9.797,A=20*Math.PI/180,T=2*Math.PI*Math.sqrt(L/g);
+ var L=1.2,g=9.8,A=20*Math.PI/180,T=2*Math.PI*Math.sqrt(L/g);
  function size(){var r=mini.getBoundingClientRect();if(!r.width)return;var d=window.devicePixelRatio||1;W=r.width;H=r.height;mini.width=Math.round(W*d);mini.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0)}
  function frame(now){
   if(W>10){
@@ -53,16 +53,4 @@ if(mini){
  size();window.addEventListener('resize',function(){size();if(reduce)requestAnimationFrame(frame)});requestAnimationFrame(frame);
 }
 
-/* Lista de espera: validación local, no se guarda ni se envía nada */
-var wl=document.getElementById('wl');
-if(wl){
- wl.addEventListener('submit',function(e){
-  e.preventDefault();
-  var em=$('#em'),v=em.value.trim(),err=$('#emerr'),ok=$('#wlok');
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)||v.length>254){err.textContent='Escribí un correo válido, con el formato nombre@dominio.com.';ok.hidden=true;em.setAttribute('aria-invalid','true');em.focus();return}
-  err.textContent='';em.removeAttribute('aria-invalid');
-  ok.hidden=false;ok.textContent='Listo. Anotamos tu pedido en esta pantalla. Esta maqueta no guardó ni envió el correo a ningún lado.';
-  wl.reset();
- });
-}
 })();
