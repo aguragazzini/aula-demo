@@ -18,7 +18,7 @@ host.innerHTML=sel+'<section><div class="shead"><span class="num">§ 1</span><h2
 '<a class="card" href="leccion.html"><span class="sc">lunes</span><h3>El péndulo: de qué depende el vaivén</h3><p class="meta">'+l1+'</p>'+(ok?'':'<p><span class="btn p" style="margin-top:6px">Empezar</span></p>')+'</a>'+
 '<div class="card"><span class="sc">miércoles</span><h3>Próximamente</h3><p class="meta">Se habilita cuando se publique.</p></div>'+
 '<div class="card"><span class="sc">viernes</span><h3>Próximamente</h3><p class="meta">Se habilita cuando se publique.</p></div></div></section>'+
-'<section><div class="shead"><span class="num">§ 2</span><h2>Antes de empezar el péndulo</h2></div><div class="cols2"><div><p class="small">Para el experimento del bloque 4. Cinco ítems. Lo que tildes queda guardado.</p></div><div>'+mh+'</div></div></section>'+
+'<section><div class="shead"><span class="num">§ 2</span><h2>Antes de empezar el péndulo</h2></div><div class="cols2"><div><p class="small">Para el experimento del bloque 2. Cinco ítems. Lo que tildes queda guardado.</p></div><div>'+mh+'</div></div></section>'+
 '<section><div class="shead"><span class="num">§ 3</span><h2>Más adelante</h2></div><ol class="toc"><li><a href="unidad.html">Unidad 3: Energía, con la puerta de unidad<span>semana 5</span></a></li><li><a href="materia.html">Programa de Física<span>unidades 2, 3, 5 y 6</span></a></li></ol></section>';
 Selector.bind(host,c,function(){location.reload()});
 host.addEventListener('change',function(e){var t=e.target;if(t.type==='checkbox'&&t.id){p.mats[t.id]=t.checked?1:0;E.save()}});

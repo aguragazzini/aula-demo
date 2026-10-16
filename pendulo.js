@@ -3,12 +3,13 @@
 var $=D.$,$$=D.$$,fmt=D.fmt;
 if(!document.getElementById('cv'))return;
 /* Predicción */
-var pA='',pB='';
+var pA='',pB='',lastX=null;
 function predUpdate(){
  var parts=[];if(pA)parts.push('A: “'+pA+'”');if(pB)parts.push('B: “'+pB+'”');
- var t=parts.length?'Tu predicción — '+parts.join(' · ')+'.':'Tu predicción: aún sin elegir.';
- $('#predmsg').textContent=parts.length?'Anotado. '+parts.join(' · ')+'. Lo retomamos en la simulación y en las preguntas.':'Todavía no elegiste. Cualquier respuesta sirve: es para comparar después.';
- $('#predecho').textContent=t;$('#predecho2').textContent=t;
+ var t=parts.length?'Tu predicción: '+parts.join(' · ')+'.':'Tu predicción: aún sin elegir.';
+ $('#predmsg').textContent=parts.length?'Anotado. '+parts.join(' · ')+'. Ahora, a probarlo con la tuerca.':'Todavía no elegiste.';
+ var x=lastX?' Con la tuerca mediste un vaivén de '+fmt(lastX.T,2)+' s con '+fmt(lastX.L,2)+' m: poné ese largo y compará.':' Si ya hiciste el experimento, anotá tu medición en el bloque 2 para compararla acá.';
+ $('#predecho').textContent=t+x;$('#predecho2').textContent=t;
 }
 function chipGroup(attr,set){$$('['+attr+']').forEach(function(b){b.addEventListener('click',function(){
  set(b.getAttribute(attr));
@@ -66,32 +67,63 @@ function draw(){
  ctx.strokeStyle='#8a8372';ctx.lineWidth=1.5;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,py+Lp+30);ctx.stroke();ctx.setLineDash([]);
  // arco del ángulo
  var ang=S.th,ar=Math.min(46,Lp*0.5);
- ctx.strokeStyle='#6e1e1e';ctx.lineWidth=2;ctx.beginPath();
+ ctx.strokeStyle='#8a8372';ctx.lineWidth=1.5;ctx.beginPath();
  ctx.arc(px,py,ar,Math.PI/2,Math.PI/2-ang,ang>0);ctx.stroke();
  // hilo
  ctx.strokeStyle='#1b1a17';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(b.x,b.y);ctx.stroke();
  // soporte
  ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(px-W*0.3,py-4);ctx.lineTo(px+W*0.3,py-4);ctx.stroke();
  // pesa
- ctx.fillStyle='#f6f3ea';ctx.strokeStyle='#6e1e1e';ctx.lineWidth=3;
- ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();ctx.stroke();
- if(S.mode==='ready'||S.drag){ctx.fillStyle='#1b1a17';ctx.font='15px system-ui,sans-serif';ctx.textAlign='center';
+ ctx.fillStyle='#6e1e1e';
+ ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();
+ if(S.mode==='ready'||S.drag){ctx.fillStyle='#1b1a17';ctx.font='15px "IBM Plex Sans",system-ui,sans-serif';ctx.textAlign='center';
   ctx.fillText('arrastrame',b.x,Math.min(H-8,b.y+b.r+20))}
- ctx.fillStyle='#1b1a17';ctx.font='16px system-ui,sans-serif';ctx.textAlign='left';
- ctx.fillText('ángulo: '+Math.round(Math.abs(S.th)/D2R)+'°',10,H-10);
- ctx.textAlign='right';ctx.fillText('t = '+fmt2(S.t,1)+' s',W-10,H-10);
+ ctx.fillStyle='#1b1a17';ctx.font='italic 18px "EB Garamond",Georgia,serif';ctx.textAlign='left';
+ ctx.fillText('θ = '+Math.round(Math.abs(S.th)/D2R)+'°',12,H-12);
+ ctx.textAlign='right';ctx.fillText('t = '+fmt2(S.t,1)+' s',W-12,H-12);
 }
 var ro_n=0;
+function row(a,b){return '<div><span>'+a+'</span><span>'+b+'</span></div>'}
+var roLast='';
 function readout(){
  var p=par(),T0=2*Math.PI*Math.sqrt(p.L/p.g);
- var txt='Período de la regla: '+fmt2(T0,3)+' s · ';
- if(S.Tm!==null){var e=(S.Tm-T0)/T0*100;txt+='medido: '+fmt2(S.Tm,3)+' s · error de la regla: '+fmt2(e,2)+' %'}
- else txt+='medido: — (soltá el péndulo y esperá dos pasos por el centro)';
- if(S.chrRes!==null)txt+=' · 10 oscilaciones: '+fmt2(S.chrRes,2)+' s → '+fmt2(S.chrRes/10,3)+' s cada una';
- else if(S.chr)txt+=' · cronómetro en marcha…';
- ro.textContent=txt;
+ var h=row('Período por la regla',fmt2(T0,2)+' s');
+ if(S.Tm!==null){var e=(S.Tm-T0)/T0*100;h+=row('Período medido',fmt2(S.Tm,2)+' s')+row('Error de la regla',fmt2(e,1)+' %')}
+ else h+=row('Período medido','soltalo y esperá');
+ if(S.chrRes!==null)h+=row('10 vaivenes',fmt2(S.chrRes,2)+' s');
+ else if(S.chr)h+=row('10 vaivenes','contando…');
+ if(h!==roLast){ro.innerHTML=h;roLast=h}
+ $('#Lv').textContent=fmt2(p.L,2)+' m';$('#Mv').textContent=fmt2(p.m,2)+' kg';$('#Av').textContent=Math.round(p.a)+'°';
  $('#warn').hidden=!(p.a>20);
 }
+/* Mediciones: experimento y simulación en la misma tabla */
+var MED=[];
+function medDraw(){
+ var tb=$('#medtab');
+ if(!MED.length){tb.innerHTML='<tr><td colspan="4" class="small">Todavía no anotaste nada.</td></tr>';return}
+ tb.innerHTML=MED.map(function(m){return '<tr><td>'+m.c+'</td><td class="n">'+m.L+'</td><td class="n">'+m.p+'</td><td class="n">'+m.T+'</td></tr>'}).join('');
+}
+$('#fx').addEventListener('submit',function(e){
+ e.preventDefault();
+ var L=parseFloat(String($('#xL').value).replace(',','.')),T=parseFloat(String($('#xT').value).replace(',','.')),msg=$('#xmsg');
+ if(!(L>0)){msg.textContent='Escribí el largo en centímetros.';return}
+ if(!(T>0)){msg.textContent='Escribí cuánto tardaron los 10 vaivenes, en segundos.';return}
+ MED.push({c:'Tuerca',L:fmt2(L/100,2)+' m',p:$('#xM').value,T:fmt2(T/10,2)+' s'});medDraw();
+ lastX={L:L/100,T:T/10};predUpdate();
+ msg.textContent='Anotado: un vaivén de '+fmt2(T/10,2)+' s con '+fmt2(L/100,2)+' m. Lo vas a comparar en la simulación.';
+ $('#xT').value='';
+});
+$('#anotar').addEventListener('click',function(){
+ var p=par(),T=S.chrRes!==null?S.chrRes/10:(S.Tm!==null?S.Tm:2*Math.PI*Math.sqrt(p.L/p.g));
+ MED.push({c:'Simulación',L:fmt2(p.L,2)+' m',p:fmt2(p.m,2)+' kg',T:fmt2(T,2)+' s'});medDraw();
+});
+/* Pasos: marca el bloque que se está viendo */
+(function(){
+ var links=$$('#pasos a');if(!links.length||!window.IntersectionObserver)return;
+ var io=new IntersectionObserver(function(es){es.forEach(function(en){if(!en.isIntersecting)return;
+  links.forEach(function(a){var on=a.getAttribute('href')==='#'+en.target.id;if(on)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current')})})},{rootMargin:'-40% 0px -55% 0px'});
+ links.forEach(function(a){var s=document.querySelector(a.getAttribute('href'));if(s)io.observe(s)});
+})();
 function energy(){
  var p=par(),Ec=0.5*p.m*p.L*p.L*S.w*S.w,Ep=p.m*p.g*p.L*(1-Math.cos(S.th)),sc=p.m*p.g*p.L*(1-Math.cos(60*D2R));
  function pc(x){return Math.max(0,Math.min(100,x/sc*100))+'%'}
@@ -146,6 +178,6 @@ $$('[data-st]').forEach(function(b){b.addEventListener('click',function(){
  el.value=v;el.dispatchEvent(new Event('input'));
 });});
 window.addEventListener('resize',resize);
-resize();resetSim();requestAnimationFrame(frame);
+resize();resetSim();predUpdate();requestAnimationFrame(frame);
 
 })();
