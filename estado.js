@@ -12,8 +12,8 @@ function hash(p){try{return btoa(unescape(encodeURIComponent('d1:'+p)))}catch(e)
 function nuevoProg(){return{unidad:3,semana:1,chequeos:{},puerta:null,minHijo:0,minAdulto:0,gasto:0,mats:{}}}
 function seed(){
  var p=nuevoProg();p.chequeos.pendulo={ok:4,fecha:'2026-10-12'};p.minHijo=52;p.minAdulto=60;p.mats={m1:1,m2:1,m3:1,m4:1,m5:1};
- return{sesion:'marcela.benitez@correo.com',cuentas:{'marcela.benitez@correo.com':{
-  nombre:'Marcela Benítez',pw:hash('domus2026'),plan:'familia',alta:'2026-09-28',
+ return{sesion:'ricardo.arroyo@correo.com',cuentas:{'ricardo.arroyo@correo.com':{
+  nombre:'Ricardo Arroyo',pw:hash('domus2026'),plan:'familia',alta:'2026-09-28',
   hijos:[{id:1,nombre:'Tomás',edad:11,prog:p},{id:2,nombre:'Lucía',edad:7,prog:nuevoProg()}],hijo:1}}};
 }
 function load(){
